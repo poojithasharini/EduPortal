@@ -35,6 +35,7 @@ const App = () => (
             <Route path="/attendance" element={<AttendancePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/students" element={<StudentsPage />} />
+            <Route path="/grading" element={<GradingPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
