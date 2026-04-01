@@ -28,6 +28,7 @@ const professorLinks = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/courses", icon: BookOpen, label: "Courses" },
   { to: "/assignments", icon: ClipboardList, label: "Assignments" },
+  { to: "/grading", icon: Star, label: "Grading" },
   { to: "/students", icon: Users, label: "Students" },
   { to: "/grades", icon: GraduationCap, label: "Grades" },
   { to: "/attendance", icon: BarChart3, label: "Attendance" },
