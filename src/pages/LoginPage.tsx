@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,17 +12,36 @@ export default function LoginPage() {
   const [role, setRole] = useState<UserRole>("student");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login, register } = useAuth();
+  const { login, register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  if (isAuthenticated) {
+    navigate("/dashboard", { replace: true });
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       if (isLogin) {
-        await login(email, password);
+        const result = await login(email, password);
+        if (result.error) {
+          toast.error(result.error);
+          return;
+        }
       } else {
-        await register(name, email, password, role);
+        if (password.length < 6) {
+          toast.error("Password must be at least 6 characters");
+          return;
+        }
+        const result = await register(name, email, password, role);
+        if (result.error) {
+          toast.error(result.error);
+          return;
+        }
+        toast.success("Account created! You can now sign in.");
       }
       navigate("/dashboard");
     } finally {
@@ -83,18 +103,6 @@ export default function LoginPage() {
               {isLogin ? "Sign in to access your dashboard" : "Register to get started"}
             </p>
           </div>
-
-          {/* Demo credentials */}
-          {isLogin && (
-            <div className="rounded-xl border border-info/30 bg-info/5 p-4 space-y-2">
-              <p className="text-sm font-semibold text-info">Demo Credentials</p>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>Student: <span className="font-mono text-foreground">student@demo.com</span></p>
-                <p>Professor: <span className="font-mono text-foreground">professor@demo.com</span></p>
-                <p className="text-muted-foreground">(any password works)</p>
-              </div>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
