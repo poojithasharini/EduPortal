@@ -14,6 +14,7 @@ import GradesPage from "./pages/GradesPage";
 import AttendancePage from "./pages/AttendancePage";
 import ProfilePage from "./pages/ProfilePage";
 import StudentsPage from "./pages/StudentsPage";
+import GradingPage from "./pages/GradingPage";
 
 const queryClient = new QueryClient();
 
