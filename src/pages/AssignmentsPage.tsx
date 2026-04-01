@@ -132,24 +132,24 @@ export default function AssignmentsPage() {
         ) : (
           <div className="space-y-3">
             {filtered.map((a: any) => (
-              <div key={a.id} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border shadow-card hover:shadow-elevated transition-all">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${a.status === "submitted" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
-                  {a.status === "submitted" ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">{a.title}</p>
-                  <p className="text-xs text-muted-foreground">{a.courseCode} · Due: {new Date(a.due_date).toLocaleDateString()}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {a.status === "pending" && user?.role === "student" && (
-                    <button onClick={() => handleSubmit(a.id)}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg gradient-primary text-primary-foreground text-xs font-semibold hover:opacity-90">
-                      <Upload className="w-3.5 h-3.5" /> Submit
-                    </button>
-                  )}
-                  {a.status === "submitted" && (
-                    <span className="text-xs font-medium text-success bg-success/10 px-2 py-1 rounded-md">Submitted</span>
-                  )}
+              <div key={a.id} className="rounded-xl bg-card border border-border shadow-card hover:shadow-elevated transition-all">
+                <div className="flex items-center gap-4 p-4">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${a.status === "submitted" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
+                    {a.status === "submitted" ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{a.title}</p>
+                    <p className="text-xs text-muted-foreground">{a.courseCode} · Due: {new Date(a.due_date).toLocaleDateString()}</p>
+                    {a.description && <p className="text-xs text-muted-foreground mt-1">{a.description}</p>}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {a.status === "pending" && user?.role === "student" && (
+                      <FileUploadSubmit assignmentId={a.id} />
+                    )}
+                    {a.status === "submitted" && (
+                      <span className="text-xs font-medium text-success bg-success/10 px-2 py-1 rounded-md">Submitted</span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
