@@ -1,9 +1,26 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Mail, User, GraduationCap } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, supabaseUser } = useAuth();
+  const [fullName, setFullName] = useState(user?.name || "");
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!supabaseUser) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: fullName })
+      .eq("user_id", supabaseUser.id);
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Profile updated!");
+  };
 
   return (
     <DashboardLayout>
@@ -29,35 +46,26 @@ export default function ProfilePage() {
               <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                 <User className="w-4 h-4 inline mr-1.5" />Full Name
               </label>
-              <input
-                type="text"
-                defaultValue={user?.name}
-                className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-              />
+              <input type="text" value={fullName} onChange={e => setFullName(e.target.value)}
+                className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all" />
             </div>
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                 <Mail className="w-4 h-4 inline mr-1.5" />Email
               </label>
-              <input
-                type="email"
-                defaultValue={user?.email}
-                className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-              />
+              <input type="email" defaultValue={user?.email} disabled
+                className="w-full rounded-lg border border-input bg-muted px-4 py-3 text-sm text-muted-foreground" />
             </div>
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                 <GraduationCap className="w-4 h-4 inline mr-1.5" />Role
               </label>
-              <input
-                type="text"
-                defaultValue={user?.role}
-                disabled
-                className="w-full rounded-lg border border-input bg-muted px-4 py-3 text-sm text-muted-foreground capitalize"
-              />
+              <input type="text" defaultValue={user?.role} disabled
+                className="w-full rounded-lg border border-input bg-muted px-4 py-3 text-sm text-muted-foreground capitalize" />
             </div>
-            <button className="gradient-primary text-primary-foreground rounded-lg px-6 py-3 text-sm font-semibold hover:opacity-90 transition-opacity">
-              Save Changes
+            <button onClick={handleSave} disabled={saving}
+              className="gradient-primary text-primary-foreground rounded-lg px-6 py-3 text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+              {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>
