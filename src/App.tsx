@@ -14,6 +14,7 @@ import GradesPage from "./pages/GradesPage";
 import AttendancePage from "./pages/AttendancePage";
 import ProfilePage from "./pages/ProfilePage";
 import StudentsPage from "./pages/StudentsPage";
+import GradingPage from "./pages/GradingPage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/attendance" element={<AttendancePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/students" element={<StudentsPage />} />
+            <Route path="/grading" element={<GradingPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
