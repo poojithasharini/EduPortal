@@ -2,7 +2,8 @@ import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, Search, Loader2 } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
+import { NotificationDropdown } from "@/components/NotificationDropdown";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
