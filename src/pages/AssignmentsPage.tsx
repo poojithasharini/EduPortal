@@ -1,12 +1,12 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { FileText, CheckCircle2, Clock, Upload, Search, Plus } from "lucide-react";
 import { useState } from "react";
-import { useAssignments, useSubmissions } from "@/hooks/usePortalData";
+import { useAssignments, useSubmissions, useCourses } from "@/hooks/usePortalData";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCourses } from "@/hooks/usePortalData";
+import { FileUploadSubmit } from "@/components/FileUploadSubmit";
 
 export default function AssignmentsPage() {
   const [filter, setFilter] = useState<"all" | "submitted" | "pending">("all");
