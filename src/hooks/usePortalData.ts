@@ -11,7 +11,7 @@ export function useCourses() {
       if (user?.role === "professor") {
         const { data, error } = await supabase
           .from("courses")
-          .select("*, profiles!courses_professor_id_fkey(full_name)")
+          .select("*")
           .eq("professor_id", supabaseUser!.id)
           .order("created_at", { ascending: false });
         if (error) throw error;
