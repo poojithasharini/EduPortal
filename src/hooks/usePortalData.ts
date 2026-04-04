@@ -73,7 +73,7 @@ export function useSubmissions() {
       if (user?.role === "professor") {
         const { data, error } = await supabase
           .from("submissions")
-          .select("*, assignments(title, course_id, courses(code)), profiles!submissions_student_id_fkey(full_name)")
+          .select("*, assignments(title, course_id, courses(code))")
           .order("submitted_at", { ascending: false });
         if (error) throw error;
         return data;
