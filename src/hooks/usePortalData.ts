@@ -99,7 +99,7 @@ export function useGrades() {
       if (user?.role === "professor") {
         const { data, error } = await supabase
           .from("grades")
-          .select("*, assignments(title, course_id, courses(code, name)), profiles!grades_student_id_fkey(full_name)")
+          .select("*, assignments(title, course_id, courses(code, name))")
           .order("graded_at", { ascending: false });
         if (error) throw error;
         return data;

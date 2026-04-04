@@ -24,7 +24,7 @@ function ProfessorAttendance() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("course_enrollments")
-        .select("student_id, profiles!course_enrollments_student_id_fkey(full_name, user_id)")
+        .select("student_id")
         .eq("course_id", selectedCourse);
       if (error) throw error;
       return data;
