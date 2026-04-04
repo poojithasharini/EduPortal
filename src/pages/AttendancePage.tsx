@@ -18,16 +18,27 @@ function ProfessorAttendance() {
   const [statuses, setStatuses] = useState<Record<string, string>>({});
   const queryClient = useQueryClient();
 
-  // Get enrolled students for selected course
+  // Get enrolled students for selected course with their profiles
   const { data: enrolledStudents } = useQuery({
     queryKey: ["enrolled-students", selectedCourse],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: enrollments, error } = await supabase
         .from("course_enrollments")
-        .select("student_id, profiles!course_enrollments_student_id_fkey(full_name, user_id)")
+        .select("student_id")
         .eq("course_id", selectedCourse);
       if (error) throw error;
-      return data;
+      if (!enrollments?.length) return [];
+      
+      const studentIds = enrollments.map(e => e.student_id);
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, full_name")
+        .in("user_id", studentIds);
+      
+      return enrollments.map(e => ({
+        student_id: e.student_id,
+        full_name: profiles?.find(p => p.user_id === e.student_id)?.full_name || "Unknown",
+      }));
     },
     enabled: !!selectedCourse,
   });
@@ -122,7 +133,7 @@ function ProfessorAttendance() {
               return (
                 <div key={e.student_id} className="flex items-center justify-between p-3 rounded-lg bg-secondary">
                   <span className="text-sm font-medium text-foreground">
-                    {(e as any).profiles?.full_name || "Unknown"}
+                    {e.full_name || "Unknown"}
                   </span>
                   <div className="flex gap-2">
                     {statusOptions.map((opt) => (

@@ -11,7 +11,7 @@ export function useCourses() {
       if (user?.role === "professor") {
         const { data, error } = await supabase
           .from("courses")
-          .select("*, profiles!courses_professor_id_fkey(full_name)")
+          .select("*")
           .eq("professor_id", supabaseUser!.id)
           .order("created_at", { ascending: false });
         if (error) throw error;
@@ -27,7 +27,7 @@ export function useCourses() {
           // Return all courses if not enrolled in any (for demo)
           const { data, error } = await supabase
             .from("courses")
-            .select("*, profiles!courses_professor_id_fkey(full_name)")
+            .select("*")
             .order("created_at", { ascending: false });
           if (error) throw error;
           return data;
@@ -36,7 +36,7 @@ export function useCourses() {
         const courseIds = enrollments.map((e) => e.course_id);
         const { data, error } = await supabase
           .from("courses")
-          .select("*, profiles!courses_professor_id_fkey(full_name)")
+          .select("*")
           .in("id", courseIds)
           .order("created_at", { ascending: false });
         if (error) throw error;
@@ -73,7 +73,7 @@ export function useSubmissions() {
       if (user?.role === "professor") {
         const { data, error } = await supabase
           .from("submissions")
-          .select("*, assignments(title, course_id, courses(code)), profiles!submissions_student_id_fkey(full_name)")
+          .select("*, assignments(title, course_id, courses(code))")
           .order("submitted_at", { ascending: false });
         if (error) throw error;
         return data;
@@ -99,7 +99,7 @@ export function useGrades() {
       if (user?.role === "professor") {
         const { data, error } = await supabase
           .from("grades")
-          .select("*, assignments(title, course_id, courses(code, name)), profiles!grades_student_id_fkey(full_name)")
+          .select("*, assignments(title, course_id, courses(code, name))")
           .order("graded_at", { ascending: false });
         if (error) throw error;
         return data;
