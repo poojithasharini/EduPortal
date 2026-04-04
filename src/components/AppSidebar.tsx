@@ -11,6 +11,7 @@ import {
   LogOut,
   ChevronLeft,
   Star,
+  CalendarDays,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ const studentLinks = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/courses", icon: BookOpen, label: "Courses" },
   { to: "/assignments", icon: FileText, label: "Assignments" },
+  { to: "/calendar", icon: CalendarDays, label: "Calendar" },
   { to: "/grades", icon: GraduationCap, label: "Grades" },
   { to: "/attendance", icon: BarChart3, label: "Attendance" },
   { to: "/profile", icon: User, label: "Profile" },
@@ -29,6 +31,7 @@ const professorLinks = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/courses", icon: BookOpen, label: "Courses" },
   { to: "/assignments", icon: ClipboardList, label: "Assignments" },
+  { to: "/calendar", icon: CalendarDays, label: "Calendar" },
   { to: "/grading", icon: Star, label: "Grading" },
   { to: "/students", icon: Users, label: "Students" },
   { to: "/grades", icon: GraduationCap, label: "Grades" },

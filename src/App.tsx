@@ -15,6 +15,7 @@ import AttendancePage from "./pages/AttendancePage";
 import ProfilePage from "./pages/ProfilePage";
 import StudentsPage from "./pages/StudentsPage";
 import GradingPage from "./pages/GradingPage";
+import CalendarPage from "./pages/CalendarPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/courses" element={<CoursesPage />} />
             <Route path="/assignments" element={<AssignmentsPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/grades" element={<GradesPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
             <Route path="/profile" element={<ProfilePage />} />
