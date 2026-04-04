@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Search, Loader2 } from "lucide-react";
 import { NotificationDropdown } from "@/components/NotificationDropdown";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -31,7 +32,8 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
               className="bg-transparent text-sm outline-none flex-1 text-foreground placeholder:text-muted-foreground"
             />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
             <NotificationDropdown />
             <div className="w-9 h-9 rounded-full gradient-primary flex items-center justify-center text-primary-foreground font-semibold text-sm">
               {user?.name?.charAt(0) || "U"}
