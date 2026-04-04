@@ -133,7 +133,7 @@ function ProfessorAttendance() {
               return (
                 <div key={e.student_id} className="flex items-center justify-between p-3 rounded-lg bg-secondary">
                   <span className="text-sm font-medium text-foreground">
-                    {(e as any).profiles?.full_name || "Unknown"}
+                    {e.full_name || "Unknown"}
                   </span>
                   <div className="flex gap-2">
                     {statusOptions.map((opt) => (
