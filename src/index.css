@@ -65,6 +65,62 @@
     --font-display: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', sans-serif;
   }
+
+  .dark {
+    --background: 224 30% 10%;
+    --foreground: 220 20% 93%;
+
+    --card: 224 25% 14%;
+    --card-foreground: 220 20% 93%;
+
+    --popover: 224 25% 14%;
+    --popover-foreground: 220 20% 93%;
+
+    --primary: 234 89% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 224 20% 18%;
+    --secondary-foreground: 220 20% 93%;
+
+    --muted: 224 20% 18%;
+    --muted-foreground: 220 9% 55%;
+
+    --accent: 167 72% 46%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 224 15% 22%;
+    --input: 224 15% 22%;
+    --ring: 234 89% 65%;
+
+    --success: 152 69% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(234 89% 65%), hsl(258 70% 62%));
+    --gradient-accent: linear-gradient(135deg, hsl(167 72% 46%), hsl(199 89% 48%));
+    --gradient-warm: linear-gradient(135deg, hsl(38 92% 50%), hsl(25 95% 53%));
+    --gradient-hero: linear-gradient(135deg, hsl(234 89% 30%), hsl(258 60% 40%));
+
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4);
+    --shadow-lg: 0 10px 25px -3px hsl(0 0% 0% / 0.5);
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.3);
+
+    --sidebar-background: 224 25% 12%;
+    --sidebar-foreground: 220 20% 93%;
+    --sidebar-primary: 234 89% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 234 40% 20%;
+    --sidebar-accent-foreground: 234 89% 75%;
+    --sidebar-border: 224 15% 22%;
+    --sidebar-ring: 234 89% 65%;
+  }
 }
 
 @layer base {
