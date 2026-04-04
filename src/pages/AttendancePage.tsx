@@ -18,16 +18,27 @@ function ProfessorAttendance() {
   const [statuses, setStatuses] = useState<Record<string, string>>({});
   const queryClient = useQueryClient();
 
-  // Get enrolled students for selected course
+  // Get enrolled students for selected course with their profiles
   const { data: enrolledStudents } = useQuery({
     queryKey: ["enrolled-students", selectedCourse],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: enrollments, error } = await supabase
         .from("course_enrollments")
         .select("student_id")
         .eq("course_id", selectedCourse);
       if (error) throw error;
-      return data;
+      if (!enrollments?.length) return [];
+      
+      const studentIds = enrollments.map(e => e.student_id);
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, full_name")
+        .in("user_id", studentIds);
+      
+      return enrollments.map(e => ({
+        student_id: e.student_id,
+        full_name: profiles?.find(p => p.user_id === e.student_id)?.full_name || "Unknown",
+      }));
     },
     enabled: !!selectedCourse,
   });
