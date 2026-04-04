@@ -27,7 +27,7 @@ export function useCourses() {
           // Return all courses if not enrolled in any (for demo)
           const { data, error } = await supabase
             .from("courses")
-            .select("*, profiles!courses_professor_id_fkey(full_name)")
+            .select("*")
             .order("created_at", { ascending: false });
           if (error) throw error;
           return data;
