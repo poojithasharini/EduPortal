@@ -16,6 +16,7 @@ import ProfilePage from "./pages/ProfilePage";
 import StudentsPage from "./pages/StudentsPage";
 import GradingPage from "./pages/GradingPage";
 import CalendarPage from "./pages/CalendarPage";
+import CourseDetailPage from "./pages/CourseDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/login" element={<LoginPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/courses/:id" element={<CourseDetailPage />} />
             <Route path="/assignments" element={<AssignmentsPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/grades" element={<GradesPage />} />
