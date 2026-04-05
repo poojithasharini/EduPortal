@@ -12,6 +12,9 @@ export default function LoginPage() {
   const [role, setRole] = useState<UserRole>("student");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
   const { login, register, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
