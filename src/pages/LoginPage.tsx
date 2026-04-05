@@ -177,6 +177,18 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {isLogin && (
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={() => setShowForgot(true)}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
@@ -185,6 +197,37 @@ export default function LoginPage() {
               {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
             </button>
           </form>
+
+          {showForgot && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-card rounded-xl p-6 w-full max-w-sm space-y-4 border border-border shadow-lg">
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setShowForgot(false)} className="text-muted-foreground hover:text-foreground">
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
+                  <h3 className="font-display font-bold text-lg text-foreground">Reset Password</h3>
+                </div>
+                <p className="text-sm text-muted-foreground">Enter your email and we'll send you a reset link.</p>
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    className="w-full rounded-lg border border-input bg-card px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                    placeholder="you@example.com"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={forgotLoading}
+                    className="w-full gradient-primary text-primary-foreground rounded-lg py-3 text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    {forgotLoading ? "Sending..." : "Send Reset Link"}
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
 
           <p className="text-center text-sm text-muted-foreground">
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
