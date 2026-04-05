@@ -1,5 +1,6 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { BookOpen, Clock, Plus, UserPlus, LogIn } from "lucide-react";
+import { BookOpen, Clock, Plus, UserPlus, LogIn, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useCourses } from "@/hooks/usePortalData";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
@@ -181,31 +182,39 @@ export default function CoursesPage() {
                   </div>
                   {/* Professor: enroll student button */}
                   {user?.role === "professor" && (
-                    <div>
+                    <div className="flex items-center justify-between">
                       <button
                         onClick={() => setShowEnroll(showEnroll === course.id ? null : course.id)}
                         className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
                       >
                         <UserPlus className="w-3.5 h-3.5" /> Enroll Student
                       </button>
-                      {showEnroll === course.id && (
-                        <div className="mt-2 flex gap-2">
-                          <input
-                            value={studentEmail}
-                            onChange={(e) => setStudentEmail(e.target.value)}
-                            placeholder="Student name..."
-                            className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                          />
-                          <button
-                            onClick={() => handleEnrollStudent(course.id)}
-                            className="gradient-primary text-primary-foreground px-3 py-2 rounded-lg text-xs font-semibold"
-                          >
-                            Add
-                          </button>
-                        </div>
-                      )}
+                      <Link to={`/courses/${course.id}`} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                        View Details <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
                     </div>
                   )}
+                  {user?.role === "student" && (
+                    <Link to={`/courses/${course.id}`} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                      View Details <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
+                  {showEnroll === course.id && (
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        value={studentEmail}
+                        onChange={(e) => setStudentEmail(e.target.value)}
+                        placeholder="Student name..."
+                        className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                      />
+                      <button
+                        onClick={() => handleEnrollStudent(course.id)}
+                        className="gradient-primary text-primary-foreground px-3 py-2 rounded-lg text-xs font-semibold"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  )
                 </div>
               </div>
             ))}
