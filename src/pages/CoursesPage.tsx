@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { BookOpen, Clock, Plus, UserPlus, LogIn, ArrowRight } from "lucide-react";
+import { BookOpen, Clock, Plus, UserPlus, LogIn, ArrowRight, Trash2, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCourses } from "@/hooks/usePortalData";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,6 +7,10 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const colorCycle = ["gradient-primary", "gradient-accent", "gradient-warm"];
 
@@ -19,11 +23,12 @@ export default function CoursesPage() {
   const [schedule, setSchedule] = useState("");
   const [creating, setCreating] = useState(false);
   const [enrollingId, setEnrollingId] = useState<string | null>(null);
+  const [droppingId, setDroppingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showEnroll, setShowEnroll] = useState<string | null>(null);
   const [studentEmail, setStudentEmail] = useState("");
   const queryClient = useQueryClient();
 
-  // For students: get their enrollment IDs
   const { data: myEnrollments } = useQuery({
     queryKey: ["my-enrollments", supabaseUser?.id],
     queryFn: async () => {
@@ -36,7 +41,6 @@ export default function CoursesPage() {
     enabled: !!supabaseUser && user?.role === "student",
   });
 
-  // For students: get all available courses to browse
   const { data: allCourses } = useQuery({
     queryKey: ["all-courses"],
     queryFn: async () => {
@@ -50,6 +54,13 @@ export default function CoursesPage() {
     enabled: !!supabaseUser && user?.role === "student",
   });
 
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ["courses"] });
+    queryClient.invalidateQueries({ queryKey: ["my-enrollments"] });
+    queryClient.invalidateQueries({ queryKey: ["all-courses"] });
+    queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!supabaseUser) return;
@@ -62,28 +73,46 @@ export default function CoursesPage() {
     toast.success("Course created!");
     setShowCreate(false);
     setCode(""); setName(""); setSchedule("");
-    queryClient.invalidateQueries({ queryKey: ["courses"] });
+    invalidateAll();
   };
 
-  // Student self-enroll
   const handleSelfEnroll = async (courseId: string) => {
     if (!supabaseUser) return;
     setEnrollingId(courseId);
     const { error } = await supabase.from("course_enrollments").insert({
-      course_id: courseId,
-      student_id: supabaseUser.id,
+      course_id: courseId, student_id: supabaseUser.id,
     });
     setEnrollingId(null);
     if (error) { toast.error(error.message); return; }
     toast.success("Enrolled successfully!");
-    queryClient.invalidateQueries({ queryKey: ["courses"] });
-    queryClient.invalidateQueries({ queryKey: ["my-enrollments"] });
+    invalidateAll();
   };
 
-  // Professor enroll student by email
+  const handleDropCourse = async (courseId: string) => {
+    if (!supabaseUser) return;
+    setDroppingId(courseId);
+    const { error } = await supabase
+      .from("course_enrollments")
+      .delete()
+      .eq("course_id", courseId)
+      .eq("student_id", supabaseUser.id);
+    setDroppingId(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Course dropped successfully!");
+    invalidateAll();
+  };
+
+  const handleDeleteCourse = async (courseId: string) => {
+    setDeletingId(courseId);
+    const { error } = await supabase.from("courses").delete().eq("id", courseId);
+    setDeletingId(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Course deleted!");
+    invalidateAll();
+  };
+
   const handleEnrollStudent = async (courseId: string) => {
     if (!studentEmail.trim()) return;
-    // Find student profile by looking up profiles
     const { data: profile, error: pErr } = await supabase
       .from("profiles")
       .select("user_id")
@@ -91,31 +120,21 @@ export default function CoursesPage() {
       .ilike("full_name", `%${studentEmail.trim()}%`)
       .limit(1)
       .single();
-
-    if (pErr || !profile) {
-      toast.error("Student not found. Search by name.");
-      return;
-    }
-
+    if (pErr || !profile) { toast.error("Student not found. Search by name."); return; }
     const { error } = await supabase.from("course_enrollments").insert({
-      course_id: courseId,
-      student_id: profile.user_id,
+      course_id: courseId, student_id: profile.user_id,
     });
     if (error) {
-      if (error.message.includes("duplicate")) toast.error("Student already enrolled.");
-      else toast.error(error.message);
+      toast.error(error.message.includes("duplicate") ? "Student already enrolled." : error.message);
       return;
     }
     toast.success("Student enrolled!");
-    setStudentEmail("");
-    setShowEnroll(null);
-    queryClient.invalidateQueries({ queryKey: ["courses"] });
+    setStudentEmail(""); setShowEnroll(null);
+    invalidateAll();
   };
 
   const browseCourses = user?.role === "student" ? allCourses : null;
-  const unenrolledCourses = browseCourses?.filter(
-    (c: any) => !myEnrollments?.includes(c.id)
-  );
+  const unenrolledCourses = browseCourses?.filter((c: any) => !myEnrollments?.includes(c.id));
 
   return (
     <DashboardLayout>
@@ -128,10 +147,8 @@ export default function CoursesPage() {
             </p>
           </div>
           {user?.role === "professor" && (
-            <button
-              onClick={() => setShowCreate(!showCreate)}
-              className="flex items-center gap-2 gradient-primary text-primary-foreground px-4 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
-            >
+            <button onClick={() => setShowCreate(!showCreate)}
+              className="flex items-center gap-2 gradient-primary text-primary-foreground px-4 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
               <Plus className="w-4 h-4" /> Create Course
             </button>
           )}
@@ -169,48 +186,89 @@ export default function CoursesPage() {
                   <div>
                     <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-md">{course.code}</span>
                     <h3 className="text-lg font-display font-semibold text-foreground mt-2">{course.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {course.profiles?.full_name || user?.name}
-                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{course.profiles?.full_name || user?.name}</p>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    {course.schedule && (
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" /> {course.schedule}
-                      </span>
-                    )}
-                  </div>
-                  {/* Professor: enroll student button */}
+                  {course.schedule && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4" /> {course.schedule}
+                    </div>
+                  )}
+
+                  {/* Professor actions */}
                   {user?.role === "professor" && (
                     <div className="flex items-center justify-between">
-                      <button
-                        onClick={() => setShowEnroll(showEnroll === course.id ? null : course.id)}
-                        className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-                      >
-                        <UserPlus className="w-3.5 h-3.5" /> Enroll Student
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button onClick={() => setShowEnroll(showEnroll === course.id ? null : course.id)}
+                          className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline">
+                          <UserPlus className="w-3.5 h-3.5" /> Enroll Student
+                        </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button className="flex items-center gap-1.5 text-xs font-medium text-destructive hover:underline">
+                              <Trash2 className="w-3.5 h-3.5" /> Delete
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Course?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete "{course.name}" and all related data. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteCourse(course.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                {deletingId === course.id ? "Deleting..." : "Delete"}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                       <Link to={`/courses/${course.id}`} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
                         View Details <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     </div>
                   )}
+
+                  {/* Student actions: Drop + View */}
                   {user?.role === "student" && (
-                    <Link to={`/courses/${course.id}`} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
-                      View Details <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                    <div className="flex items-center justify-between">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="flex items-center gap-1.5 text-xs font-medium text-destructive hover:underline">
+                            <XCircle className="w-3.5 h-3.5" /> Drop Course
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Drop Course?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to drop "{course.name}"? You can re-enroll later from Available Courses.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDropCourse(course.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                              {droppingId === course.id ? "Dropping..." : "Drop Course"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <Link to={`/courses/${course.id}`} className="flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                        View Details <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
                   )}
+
                   {showEnroll === course.id && (
                     <div className="mt-2 flex gap-2">
-                      <input
-                        value={studentEmail}
-                        onChange={(e) => setStudentEmail(e.target.value)}
+                      <input value={studentEmail} onChange={(e) => setStudentEmail(e.target.value)}
                         placeholder="Student name..."
-                        className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                      <button
-                        onClick={() => handleEnrollStudent(course.id)}
-                        className="gradient-primary text-primary-foreground px-3 py-2 rounded-lg text-xs font-semibold"
-                      >
+                        className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+                      <button onClick={() => handleEnrollStudent(course.id)}
+                        className="gradient-primary text-primary-foreground px-3 py-2 rounded-lg text-xs font-semibold">
                         Add
                       </button>
                     </div>
@@ -240,11 +298,8 @@ export default function CoursesPage() {
                         <Clock className="w-4 h-4" /> {course.schedule}
                       </div>
                     )}
-                    <button
-                      onClick={() => handleSelfEnroll(course.id)}
-                      disabled={enrollingId === course.id}
-                      className="flex items-center gap-2 w-full justify-center gradient-accent text-accent-foreground px-4 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity"
-                    >
+                    <button onClick={() => handleSelfEnroll(course.id)} disabled={enrollingId === course.id}
+                      className="flex items-center gap-2 w-full justify-center gradient-accent text-accent-foreground px-4 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity">
                       <LogIn className="w-4 h-4" />
                       {enrollingId === course.id ? "Enrolling..." : "Enroll"}
                     </button>
