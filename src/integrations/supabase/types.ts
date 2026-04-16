@@ -119,6 +119,35 @@ export type Database = {
           },
         ]
       }
+      course_invitations: {
+        Row: {
+          course_id: string
+          id: string
+          invited_at: string
+          student_email: string
+        }
+        Insert: {
+          course_id: string
+          id?: string
+          invited_at?: string
+          student_email: string
+        }
+        Update: {
+          course_id?: string
+          id?: string
+          invited_at?: string
+          student_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_invitations_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           code: string
