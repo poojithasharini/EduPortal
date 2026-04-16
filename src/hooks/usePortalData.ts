@@ -17,21 +17,13 @@ export function useCourses() {
         if (error) throw error;
         return data;
       } else {
-        // Student: get enrolled courses
+        // Student: get ONLY enrolled courses (no fallback to all)
         const { data: enrollments } = await supabase
           .from("course_enrollments")
           .select("course_id")
           .eq("student_id", supabaseUser!.id);
 
-        if (!enrollments?.length) {
-          // Return all courses if not enrolled in any (for demo)
-          const { data, error } = await supabase
-            .from("courses")
-            .select("*")
-            .order("created_at", { ascending: false });
-          if (error) throw error;
-          return data;
-        }
+        if (!enrollments?.length) return [];
 
         const courseIds = enrollments.map((e) => e.course_id);
         const { data, error } = await supabase

@@ -128,8 +128,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
-              <>
-                <div>
+              <div>
                   <label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label>
                   <input
                     type="text"
@@ -139,27 +138,10 @@ export default function LoginPage() {
                     placeholder="John Doe"
                     required
                   />
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    🎓 You'll be registered as a Student. Contact admin if you're a professor.
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1.5">Role</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(["student", "professor"] as const).map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() => setRole(r)}
-                        className={`rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
-                          role === r
-                            ? "border-primary bg-primary/5 text-primary"
-                            : "border-input text-muted-foreground hover:border-primary/30"
-                        }`}
-                      >
-                        {r === "student" ? "🎓 Student" : "👨‍🏫 Professor"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
             )}
 
             <div>
