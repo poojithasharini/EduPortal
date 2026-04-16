@@ -77,12 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {};
   };
 
-  const register = async (name: string, email: string, password: string, role: UserRole) => {
+  const register = async (name: string, email: string, password: string, _role: UserRole) => {
+    // Always register as student — professor accounts must be created by admin
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: name, role },
+        data: { full_name: name, role: "student" },
       },
     });
     if (error) return { error: error.message };
